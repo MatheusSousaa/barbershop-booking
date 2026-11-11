@@ -122,6 +122,7 @@ async function selectDateStripDay(button) {
   });
   bookingState.selectedDate = dateString;
   clearSelectedTime();
+  updateBookingReview();
   await loadSlots(dateString);
   if (bookingState.selectedDate === dateString) goToStep(3);
 }
@@ -193,15 +194,17 @@ async function loadServices() {
     loadingEl.classList.add('hidden');
 
     if (!Array.isArray(services) || services.length === 0) {
-      errorEl.textContent = 'Nenhum serviço disponível no momento. Tente novamente mais tarde.';
+      showCatalogFallback(errorEl, 'Estamos atualizando a agenda de serviços. Fale com o barbeiro para combinar seu próximo horário.');
       errorEl.classList.remove('feedback-error');
       errorEl.classList.add('feedback-empty');
       errorEl.setAttribute('role', 'status');
       errorEl.classList.remove('hidden');
+      document.getElementById('continue-service').classList.add('hidden');
       return;
     }
 
     window.loadedServices = services;
+    document.getElementById('continue-service').classList.remove('hidden');
     listEl.setAttribute('aria-busy', 'false');
     services.forEach((service, index) => {
       const card = createServiceCard(service, index === 0);
@@ -210,7 +213,7 @@ async function loadServices() {
     });
   } catch (error) {
     loadingEl.classList.add('hidden');
-    errorEl.textContent = 'Não foi possível carregar os serviços. Verifique a conexão e tente novamente.';
+    showCatalogFallback(errorEl, 'Não conseguimos carregar os serviços agora. Tente novamente ou fale diretamente com o barbeiro.', true);
     errorEl.classList.remove('feedback-empty');
     errorEl.classList.add('feedback-error');
     errorEl.setAttribute('role', 'alert');
@@ -274,7 +277,10 @@ function createServiceCard(service, selected) {
   const price = document.createElement('span');
   price.className = 'price';
   price.textContent = `R$ ${formatPrice(service.price)}`;
-  footer.append(price, radioLabel);
+  const duration = document.createElement('span');
+  duration.className = 'service-duration';
+  duration.textContent = '30 min';
+  footer.append(price, duration, radioLabel);
   info.append(name, description, footer);
 
   card.append(photoButton, info);
@@ -346,6 +352,7 @@ function selectService(service, selectedCard) {
   bookingState.selectedServiceId = service.id;
   bookingState.selectedServiceName = service.name;
   bookingState.selectedServicePrice = service.price;
+  updateBookingReview();
   if (serviceChanged) {
     clearSelectedTime();
     if (bookingState.selectedDate) loadSlots(bookingState.selectedDate);
@@ -355,6 +362,45 @@ function selectService(service, selectedCard) {
 function formatPrice(price) {
   const value = Number(price);
   return Number.isFinite(value) ? value.toFixed(2).replace('.', ',') : '0,00';
+}
+
+function updateBookingReview() {
+  const service = document.getElementById('review-service');
+  if (!service) return;
+  service.textContent = bookingState.selectedServiceName || 'Escolha um serviço';
+  document.getElementById('review-price').textContent = bookingState.selectedServiceId
+    ? `R$ ${formatPrice(bookingState.selectedServicePrice)}`
+    : '—';
+  const dateTime = bookingState.selectedDate && bookingState.selectedTime
+    ? `${BarbershopUtils.formatDateDisplay(bookingState.selectedDate)} · ${bookingState.selectedTime.substring(0, 5)}`
+    : 'Escolha uma data e um horário';
+  document.getElementById('review-datetime').textContent = dateTime;
+}
+
+function showCatalogFallback(container, message, allowRetry = false) {
+  container.replaceChildren();
+  const copy = document.createElement('p');
+  copy.textContent = message;
+  container.appendChild(copy);
+  const phone = BarbershopUtils.normalizeBrazilianPhone(window.BARBERSHOP_CONTACT?.barberWhatsApp);
+  if (phone) {
+    const link = document.createElement('a');
+    const text = encodeURIComponent('Olá! Gostaria de consultar os serviços e agendar um horário na Barber Braga.');
+    link.href = `https://wa.me/${phone}?text=${text}`;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.className = 'btn-primary catalog-contact-link';
+    link.textContent = 'Consultar pelo WhatsApp';
+    container.appendChild(link);
+  }
+  if (allowRetry) {
+    const retry = document.createElement('button');
+    retry.type = 'button';
+    retry.className = 'text-button catalog-retry';
+    retry.textContent = 'Tentar carregar novamente';
+    retry.addEventListener('click', loadServices);
+    container.appendChild(retry);
+  }
 }
 
 let photoViewerReturnFocus = null;
@@ -410,6 +456,9 @@ function initializePhotoViewer() {
 
 function clearSelectedTime() {
   bookingState.selectedTime = '';
+  const note = document.getElementById('selected-slot-note');
+  if (note) note.classList.add('hidden');
+  updateBookingReview();
   document.querySelectorAll('.slot-btn').forEach((button) => {
     button.classList.remove('selected');
     button.setAttribute('aria-pressed', 'false');
@@ -473,6 +522,10 @@ async function loadSlots(dateString) {
         button.classList.add('selected');
         button.setAttribute('aria-pressed', 'true');
         bookingState.selectedTime = slot;
+        const note = document.getElementById('selected-slot-note');
+        note.textContent = `Horário escolhido: ${slot.substring(0, 5)} · duração de 30 minutos.`;
+        note.classList.remove('hidden');
+        updateBookingReview();
       });
       grid.appendChild(button);
     });

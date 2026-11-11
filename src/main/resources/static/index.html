@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#0a0a0a">
-  <meta name="description" content="Consulte os serviços disponíveis e escolha um horário para seu atendimento.">
+  <meta name="description" content="Agende seu próximo corte com a Barber Braga, em Barra do Choça. Escolha o serviço e um horário disponível online.">
+  <meta property="og:title" content="Barber Braga — Seu próximo corte começa aqui">
+  <meta property="og:description" content="Escolha seu serviço e agende um horário com a Barber Braga.">
+  <meta property="og:type" content="website">
   <title>Barber Braga — Agendamento</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -28,6 +31,11 @@
       <div class="hero-actions">
         <a href="#agendamento" class="btn-solid">Escolher serviço</a>
       </div>
+      <ul class="hero-highlights" aria-label="Vantagens do agendamento">
+        <li><span aria-hidden="true">✓</span> Horários atualizados</li>
+        <li><span aria-hidden="true">✓</span> Reserva online</li>
+        <li><span aria-hidden="true">✓</span> Confirmação pelo WhatsApp</li>
+      </ul>
     </div>
   </header>
 
@@ -98,6 +106,7 @@
           <div id="slots-loading" class="feedback-box feedback-loading hidden" role="status" aria-live="polite">Consultando horários disponíveis…</div>
           <div id="slots-error" class="feedback-box feedback-error hidden" role="status" aria-live="polite"></div>
           <div id="slots-grid" class="slots-grid hidden" role="group" aria-label="Horários disponíveis"></div>
+          <p id="selected-slot-note" class="selected-slot-note hidden" aria-live="polite"></p>
           <button type="button" class="btn-primary step-continue" id="continue-time">Continuar para seus dados</button>
         </section>
 
@@ -106,6 +115,12 @@
             <span class="step-num" aria-hidden="true">04</span>
             <div><p class="section-kicker">Etapa 4</p><h2 id="step-4-title" tabindex="-1">Seus dados</h2></div>
           </div>
+          <aside id="booking-review" class="booking-review" aria-label="Resumo do agendamento" aria-live="polite">
+            <p class="booking-review-title">Resumo do seu horário</p>
+            <div><span>Serviço</span><strong id="review-service">Escolha um serviço</strong></div>
+            <div><span>Data e horário</span><strong id="review-datetime">Escolha uma data e um horário</strong></div>
+            <div><span>Valor</span><strong id="review-price">—</strong></div>
+          </aside>
           <form id="appointment-form" novalidate>
             <div class="form-group">
               <label for="client-name">Nome completo</label>
@@ -152,6 +167,7 @@
         <p class="section-kicker">Quem atende você</p>
         <h2 id="about-title">Sobre a Barber Braga</h2>
         <p data-content="aboutDescription"></p>
+        <a href="#agendamento" class="about-link">Encontre seu próximo horário <span aria-hidden="true">↗</span></a>
       </div>
     </section>
 
