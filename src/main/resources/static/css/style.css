@@ -803,9 +803,32 @@ textarea:focus {
 }
 
 .feedback-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
   border-color: var(--color-border);
   background: var(--color-surface-raised);
   color: var(--color-muted);
+}
+
+.feedback-loading::before,
+#btn-submit-booking[aria-busy="true"]::before {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: status-spin 0.75s linear infinite;
+  content: "";
+}
+
+#btn-submit-booking[aria-busy="true"]::before {
+  margin-right: 0.6rem;
+}
+
+@keyframes status-spin {
+  to { transform: rotate(1turn); }
 }
 
 .feedback-empty {

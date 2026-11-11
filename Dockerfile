@@ -5,7 +5,7 @@ COPY src src
 RUN mvn -B -DskipTests package
 
 FROM eclipse-temurin:21-jre-alpine
-RUN apk add --no-cache tzdata \
+RUN apk add --no-cache tzdata su-exec \
     && addgroup -S -g 10001 app \
     && adduser -S -D -H -u 10001 -G app app \
     && mkdir -p /app/uploads \
@@ -13,6 +13,8 @@ RUN apk add --no-cache tzdata \
 ENV TZ=America/Bahia
 WORKDIR /app
 COPY --from=build --chown=app:app /workspace/target/barbershop-*.jar /app/app.jar
-USER 10001:10001
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod 755 /app/docker-entrypoint.sh
+USER root
 EXPOSE 8080
-ENTRYPOINT ["java", "-Duser.timezone=America/Bahia", "-jar", "/app/app.jar"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

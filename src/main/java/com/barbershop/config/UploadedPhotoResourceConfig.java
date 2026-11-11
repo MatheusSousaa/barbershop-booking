@@ -14,11 +14,17 @@ public class UploadedPhotoResourceConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String location = photoStorage.getServicesDirectory().toUri().toString();
-        if (!location.endsWith("/")) {
-            location += "/";
-        }
+        String uploadLocation = asDirectoryLocation(photoStorage.getUploadDirectory());
+        String servicesLocation = asDirectoryLocation(photoStorage.getServicesDirectory());
         registry.addResourceHandler("/uploads/services/**")
-                .addResourceLocations(location);
+                .addResourceLocations(servicesLocation);
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations(uploadLocation);
+    }
+
+    private String asDirectoryLocation(java.nio.file.Path directory) {
+        String location = directory.toUri().toString();
+        if (!location.endsWith("/")) location += "/";
+        return location;
     }
 }

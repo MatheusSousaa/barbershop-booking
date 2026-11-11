@@ -27,11 +27,14 @@ public class ServicePhotoStorage {
     private static final long MAX_IMAGE_PIXELS = 20_000_000;
 
     @Getter
+    private final Path uploadDirectory;
+    @Getter
     private final Path servicesDirectory;
 
     public ServicePhotoStorage(
             @Value("${barbershop.upload.directory:./uploads}") String uploadDirectory) {
-        this.servicesDirectory = Path.of(uploadDirectory).toAbsolutePath().normalize().resolve("services");
+        this.uploadDirectory = Path.of(uploadDirectory).toAbsolutePath().normalize();
+        this.servicesDirectory = this.uploadDirectory.resolve("services");
     }
 
     public StoredPhoto store(MultipartFile file) {
@@ -51,9 +54,9 @@ public class ServicePhotoStorage {
             byte[] content = file.getBytes();
             String extension = validateImage(content, file.getContentType());
             String fileName = UUID.randomUUID().toString().replace("-", "") + extension;
-            Files.createDirectories(servicesDirectory);
-            Files.write(servicesDirectory.resolve(fileName), content, StandardOpenOption.CREATE_NEW);
-            return new StoredPhoto(fileName, "/uploads/services/" + fileName);
+            Files.createDirectories(uploadDirectory);
+            Files.write(uploadDirectory.resolve(fileName), content, StandardOpenOption.CREATE_NEW);
+            return new StoredPhoto(fileName, "/uploads/" + fileName);
         } catch (BusinessException exception) {
             throw exception;
         } catch (IOException exception) {
@@ -62,12 +65,13 @@ public class ServicePhotoStorage {
     }
 
     public void delete(String photoUrl) {
-        if (photoUrl == null || !photoUrl.matches("/uploads/services/[a-f0-9]{32}\\.(jpg|png)")) {
+        if (photoUrl == null || !photoUrl.matches("/uploads/(services/)?[a-f0-9]{32}\\.(jpg|png)")) {
             return;
         }
         String fileName = photoUrl.substring(photoUrl.lastIndexOf('/') + 1);
+        Path directory = photoUrl.startsWith("/uploads/services/") ? servicesDirectory : uploadDirectory;
         try {
-            Files.deleteIfExists(servicesDirectory.resolve(fileName).normalize());
+            Files.deleteIfExists(directory.resolve(fileName).normalize());
         } catch (IOException exception) {
             log.warn("Não foi possível remover a foto substituída {}", fileName, exception);
         }

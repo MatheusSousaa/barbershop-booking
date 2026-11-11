@@ -561,7 +561,7 @@ async function submitAppointment(event) {
   }
 
   const submitButton = document.getElementById('btn-submit-booking');
-  const originalLabel = 'Confirmar reserva';
+  const originalLabel = 'Confirmar agendamento';
   bookingState.isSubmitting = true;
   submitButton.disabled = true;
   submitButton.setAttribute('aria-busy', 'true');
