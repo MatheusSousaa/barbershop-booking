@@ -3,6 +3,8 @@ package com.barbershop.service;
 import com.barbershop.domain.*;
 import com.barbershop.dto.*;
 import com.barbershop.exception.BusinessException;
+import com.barbershop.exception.ResourceNotFoundException;
+import com.barbershop.exception.ServiceDeletionConflictException;
 import com.barbershop.notification.AppointmentCancelledEvent;
 import com.barbershop.notification.AppointmentNotification;
 import com.barbershop.repository.*;
@@ -46,7 +48,7 @@ public class AdminService {
     @Transactional
     public BarberService updateService(Long id, ServiceRequest request) {
         BarberService service = serviceRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Serviço não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Serviço não encontrado."));
 
         if (serviceRepository.existsByNameIgnoreCaseAndIdNot(request.name().trim(), id)) {
             throw new BusinessException("Já existe outro serviço com esse nome.");
@@ -55,15 +57,24 @@ public class AdminService {
         service.setName(request.name().trim());
         service.setDescription(request.description());
         service.setPrice(request.price());
+        if (request.active() != null) {
+            service.setActive(request.active());
+        }
         return serviceRepository.save(service);
     }
 
     @Transactional
     public void deleteService(Long id) {
         BarberService service = serviceRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Serviço não encontrado."));
-        service.setActive(false); // soft-delete
-        serviceRepository.save(service);
+                .orElseThrow(() -> new ResourceNotFoundException("Serviço não encontrado."));
+        if (service.isActive()) {
+            throw new ServiceDeletionConflictException("Desative o serviço antes de apagá-lo.");
+        }
+        if (appointmentRepository.existsByService_Id(id)) {
+            throw new ServiceDeletionConflictException(
+                    "Este serviço já foi usado em agendamentos e não pode ser apagado. Ele continua desativado.");
+        }
+        serviceRepository.delete(service);
     }
 
     // --- WorkSchedule ---

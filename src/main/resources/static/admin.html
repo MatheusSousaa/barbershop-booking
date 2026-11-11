@@ -95,9 +95,46 @@
         </div>
 
         <div class="card">
-          <h2>Serviços Cadastrados</h2>
-          <div id="admin-services-list"></div>
+          <section aria-labelledby="active-services-heading">
+            <h2 id="active-services-heading">Serviços ativos</h2>
+            <div id="admin-active-services-list"></div>
+          </section>
+          <section aria-labelledby="inactive-services-heading">
+            <h2 id="inactive-services-heading">Serviços desativados</h2>
+            <div id="admin-inactive-services-list"></div>
+          </section>
         </div>
+
+        <section id="service-editor" class="card service-editor hidden" aria-labelledby="service-editor-title">
+          <h2 id="service-editor-title">Editar serviço</h2>
+          <form id="service-editor-form" novalidate>
+            <div class="form-group">
+              <label for="edit-srv-name">Nome do serviço</label>
+              <input type="text" id="edit-srv-name" maxlength="100" required aria-describedby="edit-srv-name-error">
+              <span class="field-error" id="edit-srv-name-error"></span>
+            </div>
+            <div class="form-group">
+              <label for="edit-srv-desc">Descrição (opcional)</label>
+              <input type="text" id="edit-srv-desc" maxlength="500" aria-describedby="edit-srv-desc-error">
+              <span class="field-error" id="edit-srv-desc-error"></span>
+            </div>
+            <div class="form-group">
+              <label for="edit-srv-price">Preço (R$)</label>
+              <input type="number" id="edit-srv-price" step="0.01" min="0.01" required aria-describedby="edit-srv-price-error">
+              <span class="field-error" id="edit-srv-price-error"></span>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label" for="edit-srv-active">
+                <input type="checkbox" id="edit-srv-active">
+                Serviço ativo para novos agendamentos
+              </label>
+            </div>
+            <div class="service-editor-actions">
+              <button type="submit" class="btn" id="edit-srv-save">Salvar alterações</button>
+              <button type="button" class="btn-secondary" id="edit-srv-cancel">Cancelar edição</button>
+            </div>
+          </form>
+        </section>
       </section>
 
       <!-- Aba 3: Expediente Semanal -->
@@ -191,6 +228,18 @@
     </div>
 
   </main>
+
+  <dialog id="delete-service-dialog" class="service-confirm-dialog" aria-labelledby="delete-service-title" aria-describedby="delete-service-description">
+    <form method="dialog">
+      <h2 id="delete-service-title">Apagar serviço?</h2>
+      <p id="delete-service-description">Esta ação é permanente.</p>
+      <p id="delete-service-error" class="field-error" role="alert"></p>
+      <div class="service-editor-actions">
+        <button type="submit" class="btn-secondary" id="delete-service-cancel" value="cancel">Cancelar</button>
+        <button type="button" class="btn-danger" id="delete-service-confirm">Apagar</button>
+      </div>
+    </form>
+  </dialog>
 
   <script src="js/shared-utils.js"></script>
   <script src="js/contact-config.js"></script>

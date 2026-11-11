@@ -321,8 +321,7 @@ function getServicePhotos(service) {
       alt: `Foto do serviço ${service.name}`
     }];
   }
-  const config = window.SERVICE_IMAGES || {};
-  const configured = config.byId?.[String(service.id)] || config.byName?.[service.name];
+  const configured = window.SERVICE_IMAGES?.byId?.[String(service.id)];
   const photos = Array.isArray(configured) ? configured.slice(0, 3) : [];
   if (photos.length === 0) {
     return [{

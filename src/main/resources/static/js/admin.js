@@ -306,6 +306,11 @@ async function promptCancelAppointment(appointment, item, statusBadge, cancelBtn
 }
 
 // --- SERVIÇOS ---
+let editingService = null;
+let serviceEditorReturnFocus = null;
+let deletingService = null;
+let deleteServiceReturnFocus = null;
+
 function setupServiceControls() {
   const form = document.getElementById('service-form');
   form.addEventListener('submit', async (e) => {
@@ -335,102 +340,343 @@ function setupServiceControls() {
       showAdminMessage('Erro de conexão.', 'error');
     }
   });
+
+  setupServiceEditor();
+  setupServiceDeletionDialog();
 }
 
 async function loadAdminServices() {
-  const listEl = document.getElementById('admin-services-list');
-  showLoadingState(listEl, 'Carregando serviços...');
+  const activeList = document.getElementById('admin-active-services-list');
+  const inactiveList = document.getElementById('admin-inactive-services-list');
+  showLoadingState(activeList, 'Carregando serviços ativos...');
+  showLoadingState(inactiveList, 'Carregando serviços desativados...');
+
   try {
     const res = await authFetch('/api/admin/services');
     if (!res.ok) throw new Error('Não foi possível carregar os serviços cadastrados.');
     const services = await res.json();
-    listEl.replaceChildren();
+    activeList.replaceChildren();
+    inactiveList.replaceChildren();
 
-    if (services.length === 0) {
-      showEmptyState(listEl, 'Nenhum serviço cadastrado.');
-      return true;
-    }
-
-    services.forEach(s => {
-      const card = document.createElement('div');
-      card.className = 'service-card';
-      card.style.marginBottom = '0.5rem';
-
-      const info = document.createElement('div');
-      info.className = 'service-info';
-
-      const name = document.createElement('div');
-      name.className = 'name';
-      name.textContent = `${s.name} ${s.active ? '' : '(Inativo)'}`;
-      if (!s.active) name.style.color = 'var(--color-muted)';
-      info.appendChild(name);
-
-      const price = document.createElement('div');
-      price.className = 'price';
-      price.textContent = `R$ ${parseFloat(s.price).toFixed(2).replace('.', ',')}`;
-
-      card.appendChild(info);
-      card.appendChild(price);
-
-      const photoControls = document.createElement('div');
-      photoControls.className = 'admin-service-photo';
-      if (s.photoUrl) {
-        const preview = document.createElement('img');
-        preview.src = s.photoUrl;
-        preview.alt = `Foto de ${s.name}`;
-        preview.width = 64;
-        preview.height = 80;
-        photoControls.appendChild(preview);
-      } else {
-        const missingPhoto = document.createElement('span');
-        missingPhoto.textContent = 'Sem foto';
-        photoControls.appendChild(missingPhoto);
-      }
-
-      const photoInput = document.createElement('input');
-      photoInput.type = 'file';
-      photoInput.accept = 'image/jpeg,image/png';
-      photoInput.className = 'visually-hidden';
-      photoInput.tabIndex = -1;
-      photoInput.setAttribute('aria-label', `Escolher foto para ${s.name}`);
-      photoInput.addEventListener('change', () => uploadServicePhoto(s.id, photoInput, photoButton));
-
-      const photoButton = document.createElement('button');
-      photoButton.type = 'button';
-      photoButton.className = 'btn-outline service-photo-upload';
-      photoButton.textContent = s.photoUrl ? 'Trocar foto' : 'Adicionar foto';
-      photoButton.setAttribute('aria-label', `${photoButton.textContent} para ${s.name}`);
-      photoButton.addEventListener('click', () => photoInput.click());
-      photoControls.append(photoInput, photoButton);
-      card.appendChild(photoControls);
-
-      if (s.active) {
-        const delBtn = document.createElement('button');
-        delBtn.type = 'button';
-        delBtn.className = 'btn-danger';
-        delBtn.style.margin = '0 0 0 1rem';
-        delBtn.textContent = 'Desativar';
-        delBtn.addEventListener('click', async () => {
-          if (confirm(`Deseja desativar o serviço "${s.name}"?`)) {
-            try {
-              const deleteResponse = await authFetch(`/api/admin/services/${s.id}`, { method: 'DELETE' });
-              if (!deleteResponse.ok) throw new Error('Não foi possível desativar o serviço.');
-              await loadAdminServices();
-            } catch (err) {
-              showAdminMessage(err.message || 'Falha ao desativar o serviço.', 'error');
-            }
-          }
-        });
-        card.appendChild(delBtn);
-      }
-
-      listEl.appendChild(card);
-    });
+    const activeServices = services.filter(service => service.active);
+    const inactiveServices = services.filter(service => !service.active);
+    if (activeServices.length === 0) showEmptyState(activeList, 'Nenhum serviço ativo.');
+    if (inactiveServices.length === 0) showEmptyState(inactiveList, 'Nenhum serviço desativado.');
+    activeServices.forEach(service => activeList.appendChild(createAdminServiceCard(service)));
+    inactiveServices.forEach(service => inactiveList.appendChild(createAdminServiceCard(service)));
     return true;
   } catch (err) {
-    showListError(listEl, err.message || 'Falha ao carregar os serviços cadastrados.');
+    const message = err.message || 'Falha ao carregar os serviços cadastrados.';
+    showListError(activeList, message);
+    showListError(inactiveList, message);
     return false;
   }
+}
+
+function createAdminServiceCard(service) {
+  const card = document.createElement('article');
+  card.className = `service-card admin-service-card${service.active ? '' : ' is-inactive'}`;
+
+  const info = document.createElement('div');
+  info.className = 'service-info';
+  const name = document.createElement('div');
+  name.className = 'name';
+  name.textContent = service.name;
+  info.appendChild(name);
+
+  const badge = document.createElement('span');
+  badge.className = `service-status-badge${service.active ? '' : ' is-inactive'}`;
+  badge.textContent = service.active ? 'Ativo' : 'Desativado';
+  info.appendChild(badge);
+
+  if (service.description) {
+    const description = document.createElement('p');
+    description.className = 'desc';
+    description.textContent = service.description;
+    info.appendChild(description);
+  }
+  card.appendChild(info);
+
+  const price = document.createElement('div');
+  price.className = 'price';
+  price.textContent = `R$ ${parseFloat(service.price).toFixed(2).replace('.', ',')}`;
+  card.appendChild(price);
+
+  const photoControls = document.createElement('div');
+  photoControls.className = 'admin-service-photo';
+  if (service.photoUrl) {
+    const preview = document.createElement('img');
+    preview.src = service.photoUrl;
+    preview.alt = `Foto de ${service.name}`;
+    preview.width = 64;
+    preview.height = 80;
+    photoControls.appendChild(preview);
+  } else {
+    const missingPhoto = document.createElement('span');
+    missingPhoto.textContent = 'Sem foto';
+    photoControls.appendChild(missingPhoto);
+  }
+
+  const photoInput = document.createElement('input');
+  photoInput.type = 'file';
+  photoInput.accept = 'image/jpeg,image/png';
+  photoInput.className = 'visually-hidden';
+  photoInput.tabIndex = -1;
+  photoInput.setAttribute('aria-label', `Escolher foto para ${service.name}`);
+  const photoButton = createServiceButton(
+    service.photoUrl ? 'Trocar foto' : 'Adicionar foto',
+    'btn-outline service-photo-upload',
+    () => photoInput.click()
+  );
+  photoButton.setAttribute('aria-label', `${photoButton.textContent} para ${service.name}`);
+  photoInput.addEventListener('change', () => uploadServicePhoto(service.id, photoInput, photoButton));
+  photoControls.append(photoInput, photoButton);
+  card.appendChild(photoControls);
+
+  const actions = document.createElement('div');
+  actions.className = 'admin-service-actions';
+  actions.appendChild(createServiceButton('Editar', 'btn-outline', button => openServiceEditor(service, button)));
+  if (service.active) {
+    actions.appendChild(createServiceButton('Desativar', 'btn-secondary', button => {
+      if (window.confirm(`Deseja desativar o serviço "${service.name}"?`)) {
+        updateServiceActive(service, false, button);
+      }
+    }));
+  } else {
+    actions.appendChild(createServiceButton('Reativar', 'btn-secondary', button => {
+      updateServiceActive(service, true, button);
+    }));
+    actions.appendChild(createServiceButton('Apagar', 'btn-danger', button => openDeleteServiceDialog(service, button)));
+  }
+  card.appendChild(actions);
+  return card;
+}
+
+function createServiceButton(label, className, onClick) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = className;
+  button.textContent = label;
+  button.addEventListener('click', () => onClick(button));
+  return button;
+}
+
+function setupServiceEditor() {
+  const form = document.getElementById('service-editor-form');
+  const editor = document.getElementById('service-editor');
+  const saveButton = document.getElementById('edit-srv-save');
+  const fields = {
+    name: document.getElementById('edit-srv-name'),
+    description: document.getElementById('edit-srv-desc'),
+    price: document.getElementById('edit-srv-price')
+  };
+
+  Object.entries(fields).forEach(([key, field]) => {
+    field.addEventListener('input', () => setServiceFieldError(key, ''));
+  });
+
+  document.getElementById('edit-srv-cancel').addEventListener('click', closeServiceEditor);
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!editingService || !validateServiceEditor(fields)) return;
+
+    saveButton.disabled = true;
+    saveButton.textContent = 'Salvando...';
+    const payload = {
+      name: fields.name.value.trim(),
+      description: fields.description.value.trim(),
+      price: Number(fields.price.value),
+      active: document.getElementById('edit-srv-active').checked
+    };
+
+    try {
+      const response = await authFetch(`/api/admin/services/${editingService.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (response.status === 404) {
+        showAdminMessage('Este serviço não foi encontrado. A lista foi atualizada.', 'error');
+        closeServiceEditor();
+        await loadAdminServices();
+        document.getElementById('tab-services-control').focus();
+        return;
+      }
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        showServiceValidationErrors(error.detail || 'Não foi possível salvar o serviço.');
+        return;
+      }
+
+      closeServiceEditor();
+      await loadAdminServices();
+      document.getElementById('tab-services-control').focus();
+      showAdminMessage('Serviço atualizado com sucesso.', 'success');
+    } catch (error) {
+      if (authToken) showAdminMessage('Não foi possível conectar. Verifique a conexão e tente novamente.', 'error');
+    } finally {
+      saveButton.disabled = false;
+      saveButton.textContent = 'Salvar alterações';
+    }
+  });
+
+  editor.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeServiceEditor();
+  });
+}
+
+function validateServiceEditor(fields) {
+  let valid = true;
+  const name = fields.name.value.trim();
+  const price = Number(fields.price.value);
+  setServiceFieldError('name', '');
+  setServiceFieldError('description', '');
+  setServiceFieldError('price', '');
+
+  if (!name) {
+    setServiceFieldError('name', 'Informe o nome do serviço.');
+    valid = false;
+  } else if (name.length > 100) {
+    setServiceFieldError('name', 'O nome deve ter no máximo 100 caracteres.');
+    valid = false;
+  }
+  if (fields.description.value.length > 500) {
+    setServiceFieldError('description', 'A descrição deve ter no máximo 500 caracteres.');
+    valid = false;
+  }
+  if (!Number.isFinite(price) || price <= 0) {
+    setServiceFieldError('price', 'Informe um preço maior que zero.');
+    valid = false;
+  }
+  return valid;
+}
+
+function setServiceFieldError(fieldName, message) {
+  const fieldId = fieldName === 'description' ? 'desc' : fieldName;
+  const input = document.getElementById(`edit-srv-${fieldId}`);
+  const error = document.getElementById(`edit-srv-${fieldId}-error`);
+  input.setAttribute('aria-invalid', message ? 'true' : 'false');
+  error.textContent = message;
+}
+
+function showServiceValidationErrors(detail) {
+  const messages = detail.split(';').map(message => message.trim()).filter(Boolean);
+  let shownInline = false;
+  messages.forEach(message => {
+    const separator = message.indexOf(':');
+    if (separator < 0) return;
+    const field = message.slice(0, separator).trim();
+    const key = field === 'name' ? 'name' : field === 'description' ? 'description' : field === 'price' ? 'price' : null;
+    if (!key) return;
+    setServiceFieldError(key, message.slice(separator + 1).trim());
+    shownInline = true;
+  });
+  if (!shownInline) showAdminMessage(detail, 'error');
+}
+
+function openServiceEditor(service, trigger) {
+  editingService = service;
+  serviceEditorReturnFocus = trigger;
+  document.getElementById('edit-srv-name').value = service.name;
+  document.getElementById('edit-srv-desc').value = service.description || '';
+  document.getElementById('edit-srv-price').value = service.price;
+  document.getElementById('edit-srv-active').checked = service.active;
+  ['name', 'description', 'price'].forEach(field => setServiceFieldError(field, ''));
+  const editor = document.getElementById('service-editor');
+  editor.classList.remove('hidden');
+  editor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('edit-srv-name').focus();
+}
+
+function closeServiceEditor() {
+  const editor = document.getElementById('service-editor');
+  editor.classList.add('hidden');
+  editingService = null;
+  if (serviceEditorReturnFocus?.isConnected) serviceEditorReturnFocus.focus();
+  serviceEditorReturnFocus = null;
+}
+
+async function updateServiceActive(service, active, button) {
+  button.disabled = true;
+  try {
+    const response = await authFetch(`/api/admin/services/${service.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: service.name,
+        description: service.description || '',
+        price: Number(service.price),
+        active
+      })
+    });
+    if (response.status === 404) {
+      showAdminMessage('Este serviço não foi encontrado. A lista foi atualizada.', 'error');
+    } else if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      showAdminMessage(error.detail || 'Não foi possível atualizar o status do serviço.', 'error');
+      return;
+    } else {
+      showAdminMessage(active ? 'Serviço reativado.' : 'Serviço desativado.', 'success');
+    }
+    await loadAdminServices();
+  } catch (error) {
+    if (authToken) showAdminMessage('Não foi possível conectar. Verifique a conexão e tente novamente.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function setupServiceDeletionDialog() {
+  const dialog = document.getElementById('delete-service-dialog');
+  const deleteButton = document.getElementById('delete-service-confirm');
+  const error = document.getElementById('delete-service-error');
+
+  dialog.addEventListener('close', () => {
+    deletingService = null;
+    error.textContent = '';
+    if (deleteServiceReturnFocus?.isConnected) deleteServiceReturnFocus.focus();
+    else document.getElementById('tab-services-control').focus();
+    deleteServiceReturnFocus = null;
+  });
+  deleteButton.addEventListener('click', async () => {
+    if (!deletingService) return;
+    deleteButton.disabled = true;
+    error.textContent = '';
+    try {
+      const response = await authFetch(`/api/admin/services/${deletingService.id}`, { method: 'DELETE' });
+      if (response.status === 404) {
+        dialog.close();
+        await loadAdminServices();
+        document.getElementById('tab-services-control').focus();
+        showAdminMessage('Este serviço não foi encontrado. A lista foi atualizada.', 'error');
+        return;
+      }
+      if (!response.ok) {
+        const detail = await response.json().then(data => data.detail).catch(() => '');
+        error.textContent = detail || 'Não foi possível apagar o serviço.';
+        return;
+      }
+      dialog.close();
+      await loadAdminServices();
+      document.getElementById('tab-services-control').focus();
+      showAdminMessage('Serviço apagado permanentemente.', 'success');
+    } catch (requestError) {
+      if (authToken) error.textContent = 'Não foi possível conectar. Verifique a conexão e tente novamente.';
+    } finally {
+      deleteButton.disabled = false;
+    }
+  });
+}
+
+function openDeleteServiceDialog(service, trigger) {
+  deletingService = service;
+  deleteServiceReturnFocus = trigger;
+  document.getElementById('delete-service-description').textContent =
+    `Deseja apagar "${service.name}"? Esta ação é permanente.`;
+  document.getElementById('delete-service-error').textContent = '';
+  const dialog = document.getElementById('delete-service-dialog');
+  dialog.showModal();
+  document.getElementById('delete-service-cancel').focus();
 }
 
 async function uploadServicePhoto(serviceId, photoInput, uploadButton) {

@@ -51,7 +51,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/services/{id}")
-    @Operation(summary = "Desativa um serviço (soft-delete)")
+    @Operation(summary = "Apaga um serviço desativado que nunca foi usado em agendamentos")
     public ResponseEntity<Void> deleteService(@PathVariable Long id) {
         adminService.deleteService(id);
         return ResponseEntity.noContent().build();

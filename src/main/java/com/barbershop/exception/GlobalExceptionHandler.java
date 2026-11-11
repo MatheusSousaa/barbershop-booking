@@ -26,6 +26,18 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler(ServiceDeletionConflictException.class)
+    public ProblemDetail handleServiceDeletionConflict(ServiceDeletionConflictException ex) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ProblemDetail handleNotFound(ResourceNotFoundException ex) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
     @ExceptionHandler(BusinessException.class)
     public ProblemDetail handleBusiness(BusinessException ex) {
         return ProblemDetail.forStatusAndDetail(
