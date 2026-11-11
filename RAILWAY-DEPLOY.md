@@ -45,6 +45,7 @@ BARBER_INITIAL_USERNAME=barbeiro
 BARBER_INITIAL_EMAIL=EMAIL_REAL_DO_BARBEIRO
 BARBER_INITIAL_PASSWORD=DEFINA_UMA_SENHA_FORTE_E_UNICA
 BARBER_INITIAL_NAME=Barber Braga
+BARBER_FORCE_PASSWORD_RESET=false
 
 # Informe a origem pública exata do serviço, incluindo https://.
 # O frontend e a API são servidos juntos; inclua localhost apenas se necessário.
@@ -61,6 +62,10 @@ SMTP_RECIPIENT=
 ```
 
 Use o painel de variáveis do Railway para guardar segredos. Não use o bloco acima sem substituir o segredo JWT, a senha inicial e o domínio de exemplo. No serviço da aplicação, crie um Volume com mount path `/app/uploads`; o valor deve corresponder a `BARBERSHOP_UPLOAD_DIR`.
+
+### Redefinir a senha inicial
+
+O login do painel usa e-mail. `BARBER_INITIAL_PASSWORD` cria a conta inicial, mas não altera uma conta já salva. Se precisar redefini-la, defina sua nova senha diretamente no Railway e mude temporariamente `BARBER_FORCE_PASSWORD_RESET=true`; o app redefine somente a conta cujo e-mail corresponde a `BARBER_INITIAL_EMAIL`. Depois que o deployment iniciar e registrar a redefinição nos logs, volte `BARBER_FORCE_PASSWORD_RESET=false` e faça novo deploy. Nunca cole a senha em um chat ou commit.
 
 ## Checklist pós-deploy
 

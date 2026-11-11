@@ -30,6 +30,9 @@ public class DataInitializer implements CommandLineRunner {
     @Value("${barbershop.initial-barber.display-name:Barbeiro}")
     private String initialDisplayName;
 
+    @Value("${barbershop.initial-barber.force-password-reset:false}")
+    private boolean forcePasswordReset;
+
     @Override
     public void run(String... args) {
         if (initialEmail == null || initialEmail.isBlank() || initialPassword == null || initialPassword.isBlank()) {
@@ -51,6 +54,12 @@ public class DataInitializer implements CommandLineRunner {
 
             barberRepository.save(barber);
             log.info("Conta inicial de barbeiro criada com sucesso.");
+        } else if (forcePasswordReset) {
+            barberRepository.findByEmail(initialEmail.trim().toLowerCase()).ifPresentOrElse(barber -> {
+                barber.setPassword(passwordEncoder.encode(initialPassword));
+                barberRepository.save(barber);
+                log.info("Senha da conta inicial de barbeiro redefinida por configuração explícita.");
+            }, () -> log.warn("A redefinição de senha foi solicitada, mas não há conta com o e-mail inicial configurado."));
         } else {
             log.info("Barbeiro já existe no banco de dados. Nenhuma ação necessária.");
         }
