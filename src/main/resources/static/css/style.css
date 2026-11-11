@@ -1446,12 +1446,6 @@ textarea:focus {
     gap: 1rem;
   }
 
-  .about-photo {
-    max-height: 22rem;
-    aspect-ratio: 16 / 10;
-    object-position: center 30%;
-  }
-
   .agenda-controls input[type="date"] {
     flex-basis: 100%;
   }
@@ -1801,28 +1795,17 @@ textarea:focus {
 }
 
 .about-section {
-  display: grid;
-  grid-template-columns: minmax(12rem, 0.7fr) minmax(0, 1fr);
-  align-items: center;
-  gap: clamp(1.5rem, 5vw, 4rem);
-  padding-block: clamp(3rem, 7vw, 5rem);
-}
-
-.about-photo {
-  display: block;
-  width: 100%;
-  max-height: 28rem;
-  aspect-ratio: 4 / 3;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 1.1rem;
-  background: var(--color-surface-raised);
-  object-fit: cover;
-  object-position: center 32%;
-  box-shadow: 0 1.25rem 3rem rgba(0, 0, 0, 0.28);
+  padding-block: clamp(3.5rem, 8vw, 6rem);
 }
 
 .about-copy {
-  max-width: 35rem;
+  max-width: 54rem;
+  padding: clamp(1.5rem, 5vw, 3.5rem);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 1rem;
+  background: linear-gradient(120deg, #151517, #0e0e10);
+  box-shadow: 0 1.25rem 3rem rgba(0, 0, 0, 0.2);
 }
 
 .about-copy h2 {
@@ -1835,9 +1818,10 @@ textarea:focus {
 }
 
 .about-copy > p:last-child {
-  max-width: 34rem;
+  max-width: 46rem;
   color: #d0d0d4;
-  font-size: 1rem;
+  font-size: clamp(1rem, 1.5vw, 1.1rem);
+  line-height: 1.8;
 }
 
 .admin-header {
@@ -2093,14 +2077,7 @@ textarea:focus {
 }
 
 @media (max-width: 700px) {
-  .about-section {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1.25rem;
-  }
-
-  .about-photo {
-    max-height: 22rem;
-    aspect-ratio: 16 / 10;
-    object-position: center 30%;
+  .about-copy {
+    padding: 1.5rem;
   }
 }

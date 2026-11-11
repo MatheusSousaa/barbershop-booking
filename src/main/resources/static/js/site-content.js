@@ -3,7 +3,7 @@ window.BARBERSHOP_CONTENT = Object.freeze({
   brandName: 'Barber Braga',
   heroTitle: 'Seu próximo corte começa aqui',
   heroDescription: 'Consulte os serviços, veja as imagens disponíveis e escolha um horário para seu atendimento.',
-  aboutDescription: 'A Barber Braga oferece serviços de barbearia em Barra do Choça. Consulte as opções e horários disponíveis e faça seu agendamento online.',
+  aboutDescription: 'Na Barber Braga, em Barra do Choça, seu atendimento começa com praticidade: escolha o serviço, confira os horários disponíveis e faça seu agendamento online. Um cuidado de cada vez, no horário que funciona para você.',
   location: 'Barra do Choça / BA',
   businessHours: 'Consulte os horários disponíveis no agendamento.',
   footerNote: 'Serviços e horários sujeitos à disponibilidade.',
