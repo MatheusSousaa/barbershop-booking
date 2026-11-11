@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="description" content="Consulte os serviços disponíveis e escolha um horário para seu atendimento.">
+  <title>Barber Braga — Agendamento</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="public-page">
+  <nav class="top-nav" aria-label="Navegação principal">
+    <a href="#" class="nav-logo" data-content="brandName" aria-label="Início"></a>
+    <div class="nav-links">
+      <a href="#agendamento">Agendar</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#localizacao">Localização</a>
+      <a href="admin.html">Painel</a>
+    </div>
+  </nav>
+
+  <header class="hero-editorial">
+    <div class="hero-content">
+      <p class="hero-tagline" data-content="location"></p>
+      <h1 class="hero-title" data-content="heroTitle"></h1>
+      <p class="hero-description" data-content="heroDescription"></p>
+      <div class="hero-actions">
+        <a href="#agendamento" class="btn-solid">Escolher serviço</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="container booking-section" id="agendamento" aria-labelledby="booking-title">
+      <header class="section-header">
+        <p class="section-kicker">Atendimento com hora marcada</p>
+        <h2 id="booking-title">Agende seu horário</h2>
+        <p>Veja os serviços, escolha uma data e encontre um horário disponível.</p>
+      </header>
+
+      <div id="global-message" class="hidden" role="status" aria-live="polite"></div>
+      <ol class="booking-progress" aria-label="Etapas do agendamento">
+        <li class="progress-step active" aria-current="step"><span>1</span><span>Serviço</span></li>
+        <li class="progress-step"><span>2</span><span>Data</span></li>
+        <li class="progress-step"><span>3</span><span>Horário</span></li>
+        <li class="progress-step"><span>4</span><span>Dados</span></li>
+      </ol>
+
+      <section id="success-screen" class="card success-card hidden" aria-labelledby="success-title" tabindex="-1">
+        <p class="section-kicker">Reserva concluída</p>
+        <h2 id="success-title" tabindex="-1">Agendamento confirmado</h2>
+        <p class="success-copy">Confira os detalhes e salve o horário no seu calendário.</p>
+        <dl class="appointment-summary">
+          <div><dt>Serviço</dt><dd id="res-service"></dd></div>
+          <div><dt>Valor</dt><dd>R$ <span id="res-price"></span></dd></div>
+          <div><dt>Data</dt><dd id="res-date"></dd></div>
+          <div><dt>Horário</dt><dd id="res-time"></dd></div>
+          <div><dt>Cliente</dt><dd id="res-name"></dd></div>
+        </dl>
+        <div class="success-actions">
+          <button type="button" class="btn-primary" id="btn-whatsapp-confirmation">Enviar confirmação pelo WhatsApp</button>
+          <button type="button" class="btn-outline" id="btn-save-calendar">Salvar no calendário</button>
+        </div>
+        <button type="button" class="text-button" id="btn-new-appointment">Agendar outro horário</button>
+      </section>
+
+      <div id="booking-flow" class="booking-flow">
+        <section class="card booking-step" id="step-1" aria-labelledby="step-1-title">
+          <div class="step-heading">
+            <span class="step-num" aria-hidden="true">01</span>
+            <div><p class="section-kicker">Etapa 1</p><h2 id="step-1-title" tabindex="-1">Escolha o serviço</h2></div>
+          </div>
+          <p class="step-description">Toque em um serviço para ver as fotos e os detalhes.</p>
+          <div id="services-loading" class="feedback-box feedback-loading" role="status">Carregando serviços…</div>
+          <div id="services-error" class="feedback-box feedback-error hidden" role="alert"></div>
+          <div id="services-list" class="service-options" role="radiogroup" aria-labelledby="step-1-title" aria-busy="true"></div>
+          <button type="button" class="btn-primary step-continue" id="continue-service">Continuar para a data</button>
+        </section>
+
+        <section class="card booking-step" id="step-2" aria-labelledby="step-2-title">
+          <div class="step-heading">
+            <span class="step-num" aria-hidden="true">02</span>
+            <div><p class="section-kicker">Etapa 2</p><h2 id="step-2-title" tabindex="-1">Escolha a data</h2></div>
+          </div>
+          <div class="form-group">
+            <p class="day-strip-label" id="date-strip-label">Data desejada</p>
+            <div id="date-strip" class="day-strip" role="radiogroup" aria-labelledby="date-strip-label"></div>
+          </div>
+        </section>
+
+        <section class="card booking-step" id="step-3" aria-labelledby="step-3-title">
+          <div class="step-heading">
+            <span class="step-num" aria-hidden="true">03</span>
+            <div><p class="section-kicker">Etapa 3</p><h2 id="step-3-title" tabindex="-1">Escolha o horário</h2></div>
+          </div>
+          <div id="slots-placeholder" class="feedback-box feedback-loading" role="status">Selecione uma data para consultar os horários.</div>
+          <div id="slots-loading" class="feedback-box feedback-loading hidden" role="status" aria-live="polite">Consultando horários disponíveis…</div>
+          <div id="slots-error" class="feedback-box feedback-error hidden" role="status" aria-live="polite"></div>
+          <div id="slots-grid" class="slots-grid hidden" role="group" aria-label="Horários disponíveis"></div>
+          <button type="button" class="btn-primary step-continue" id="continue-time">Continuar para seus dados</button>
+        </section>
+
+        <section class="card booking-step" id="step-4" aria-labelledby="step-4-title">
+          <div class="step-heading">
+            <span class="step-num" aria-hidden="true">04</span>
+            <div><p class="section-kicker">Etapa 4</p><h2 id="step-4-title" tabindex="-1">Seus dados</h2></div>
+          </div>
+          <form id="appointment-form" novalidate>
+            <div class="form-group">
+              <label for="client-name">Nome completo</label>
+              <input type="text" id="client-name" placeholder="Como podemos chamar você?" required maxlength="100" autocomplete="name" aria-describedby="name-error">
+              <p id="name-error" class="field-error hidden"></p>
+            </div>
+            <div class="form-group">
+              <label for="client-phone">Celular com WhatsApp</label>
+              <input type="tel" id="client-phone" placeholder="(00) 00000-0000" required maxlength="15" inputmode="tel" autocomplete="tel" aria-describedby="phone-error">
+              <p id="phone-error" class="field-error hidden"></p>
+            </div>
+            <button type="submit" class="btn-primary" id="btn-submit-booking">Confirmar agendamento</button>
+          </form>
+        </section>
+      </div>
+
+      <dialog id="photo-viewer" class="photo-viewer" aria-label="Foto do serviço">
+        <div class="photo-viewer-panel">
+          <button type="button" id="photo-viewer-close" class="photo-viewer-close" aria-label="Fechar foto">Fechar</button>
+          <button type="button" id="photo-viewer-previous" class="photo-viewer-arrow photo-viewer-previous" aria-label="Foto anterior">‹</button>
+          <img id="photo-viewer-image" src="img/services/placeholder.svg" alt="">
+          <button type="button" id="photo-viewer-next" class="photo-viewer-arrow photo-viewer-next" aria-label="Próxima foto">›</button>
+          <p id="photo-viewer-counter" class="photo-viewer-counter"></p>
+        </div>
+      </dialog>
+    </section>
+
+    <section class="info-section" id="como-funciona" aria-labelledby="how-title">
+      <div class="wide-container">
+        <header class="section-header">
+          <p class="section-kicker">Simples e direto</p>
+          <h2 id="how-title">Como funciona</h2>
+        </header>
+        <ol class="how-grid">
+          <li><span>01</span><h3>Escolha</h3><p>Selecione um serviço e confira as fotos disponíveis.</p></li>
+          <li><span>02</span><h3>Agende</h3><p>Escolha a data e um dos horários livres.</p></li>
+          <li><span>03</span><h3>Confirme</h3><p>Informe seus dados e receba a confirmação da reserva.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="about-section wide-container" id="sobre" aria-labelledby="about-title">
+      <img class="about-photo" src="img/barber-placeholder.svg" alt="Ilustração de uma barbearia" width="900" height="1200" loading="lazy" decoding="async">
+      <div class="about-copy">
+        <p class="section-kicker">Quem atende você</p>
+        <h2 id="about-title">Sobre a Barber Braga</h2>
+        <p data-content="aboutDescription"></p>
+      </div>
+    </section>
+
+    <section class="location-section wide-container" id="localizacao" aria-labelledby="location-title">
+      <div>
+        <p class="section-kicker">Visite-nos</p>
+        <h2 id="location-title">Localização e horário</h2>
+      </div>
+      <div class="location-details">
+        <p data-content="location"></p>
+        <p data-content="businessHours"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a href="#" class="nav-logo" data-content="brandName"></a>
+    <p data-content="footerNote"></p>
+    <a class="instagram-link" data-content-href="instagramUrl" data-content="instagramLabel" target="_blank" rel="noopener noreferrer"></a>
+    <a href="admin.html">Painel da barbearia</a>
+  </footer>
+
+  <script src="js/shared-utils.js"></script>
+  <script src="js/contact-config.js"></script>
+  <script src="js/site-content.js"></script>
+  <script src="js/service-images.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

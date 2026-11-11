@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-labelledby="title description">
+  <title id="title">Foto de serviço ainda não configurada</title>
+  <desc id="description">Imagem neutra em tons escuros para substituir pela foto do serviço.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#202020"/>
+      <stop offset="1" stop-color="#0b0b0b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e5484d"/>
+      <stop offset="1" stop-color="#8f1720"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1000" fill="url(#background)"/>
+  <circle cx="400" cy="410" r="118" fill="none" stroke="#424242" stroke-width="3"/>
+  <path d="M365 410h70M400 375v70" stroke="url(#accent)" stroke-linecap="round" stroke-width="5"/>
+  <path d="M166 720h468" stroke="#343434" stroke-width="2"/>
+  <text x="400" y="790" fill="#f2f2f2" font-family="system-ui,sans-serif" font-size="30" text-anchor="middle">FOTO DO SERVIÇO</text>
+  <text x="400" y="838" fill="#a5a5a5" font-family="system-ui,sans-serif" font-size="22" text-anchor="middle">Imagem a ser configurada</text>
+</svg>

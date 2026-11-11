@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>Barber Braga — Painel</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="admin-header">
+    <img src="img/barbeiro.jpg" alt="Foto do Barbeiro" class="hero-avatar">
+    <h1 data-content="brandName"></h1>
+    <p>Painel Administrativo do Barbeiro</p>
+  </header>
+
+  <main class="container">
+
+    <div id="admin-message" class="hidden" role="status" aria-live="polite"></div>
+
+    <!-- Tela de Login -->
+    <section id="login-section" class="card login-card">
+      <div class="login-eyebrow">Área exclusiva</div>
+      <h2>Acesso Restrito</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-email">E-mail</label>
+          <input type="email" id="login-email" required placeholder="barbeiro@example.invalid">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Senha</label>
+          <input type="password" id="login-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn" id="btn-login">Entrar</button>
+      </form>
+      <div style="text-align: center; margin-top: 1rem;">
+        <a href="index.html" class="admin-back-link">&larr; Voltar para o Agendamento</a>
+      </div>
+    </section>
+
+    <!-- Painel Protegido (só aparece após login com JWT em memória) -->
+    <div id="dashboard-section" class="hidden">
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+          <span class="logged-user-label">Logado como:</span>
+          <strong id="logged-user-name"></strong>
+        </div>
+        <button type="button" class="btn btn-secondary" id="btn-logout" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.85rem;">Sair</button>
+      </div>
+
+      <!-- Barra de Abas -->
+      <nav class="tab-bar" role="tablist" aria-label="Seções do painel">
+        <button type="button" class="tab-btn active" id="tab-agenda-control" role="tab" aria-selected="true" aria-controls="tab-agenda" tabindex="0" data-tab="tab-agenda">Agenda</button>
+        <button type="button" class="tab-btn" id="tab-services-control" role="tab" aria-selected="false" aria-controls="tab-services" tabindex="-1" data-tab="tab-services">Serviços</button>
+        <button type="button" class="tab-btn" id="tab-schedule-control" role="tab" aria-selected="false" aria-controls="tab-schedule" tabindex="-1" data-tab="tab-schedule">Expediente</button>
+        <button type="button" class="tab-btn" id="tab-blocks-control" role="tab" aria-selected="false" aria-controls="tab-blocks" tabindex="-1" data-tab="tab-blocks">Bloqueios</button>
+      </nav>
+
+      <!-- Aba 1: Agenda (Dia e Semana) -->
+      <section id="tab-agenda" class="tab-content" role="tabpanel" aria-labelledby="tab-agenda-control" tabindex="0">
+        <div class="card">
+          <h2>Agenda de Atendimentos</h2>
+          <div class="agenda-controls">
+            <label class="visually-hidden" for="agenda-date">Data da agenda</label>
+            <input type="date" id="agenda-date" aria-label="Data da agenda">
+            <button type="button" class="btn" id="btn-load-daily" style="width: auto;">Dia</button>
+            <button type="button" class="btn btn-secondary" id="btn-load-weekly" style="width: auto;">Semana</button>
+          </div>
+          <div id="agenda-list"></div>
+        </div>
+      </section>
+
+      <!-- Aba 2: Serviços -->
+      <section id="tab-services" class="tab-content hidden" role="tabpanel" aria-labelledby="tab-services-control" tabindex="0">
+        <div class="card">
+          <h2>Novo Serviço</h2>
+          <form id="service-form">
+            <div class="form-group">
+              <label for="srv-name">Nome do Serviço</label>
+              <input type="text" id="srv-name" required placeholder="Ex: Barba Terapia">
+            </div>
+            <div class="form-group">
+              <label for="srv-desc">Descrição (opcional)</label>
+              <input type="text" id="srv-desc" placeholder="Ex: Toalha quente e massagem facial">
+            </div>
+            <div class="form-group">
+              <label for="srv-price">Preço (R$)</label>
+              <input type="number" step="0.01" min="0.01" id="srv-price" required placeholder="35.00">
+            </div>
+            <button type="submit" class="btn">Cadastrar Serviço</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Serviços Cadastrados</h2>
+          <div id="admin-services-list"></div>
+        </div>
+      </section>
+
+      <!-- Aba 3: Expediente Semanal -->
+      <section id="tab-schedule" class="tab-content hidden" role="tabpanel" aria-labelledby="tab-schedule-control" tabindex="0">
+        <div class="card">
+          <h2>Configurar Dia da Semana</h2>
+          <form id="schedule-form">
+            <div class="form-group">
+              <label for="sch-day">Dia da Semana</label>
+              <select id="sch-day">
+                <option value="MONDAY">Segunda-feira</option>
+                <option value="TUESDAY">Terça-feira</option>
+                <option value="WEDNESDAY">Quarta-feira</option>
+                <option value="THURSDAY">Quinta-feira</option>
+                <option value="FRIDAY">Sexta-feira</option>
+                <option value="SATURDAY">Sábado</option>
+                <option value="SUNDAY">Domingo</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="sch-workday" checked> Dia com expediente (desmarque para folga semanal)
+              </label>
+            </div>
+            <div id="sch-times-container">
+              <div class="form-group">
+                <label for="sch-start">Início do Expediente</label>
+                <input type="time" id="sch-start" value="08:00">
+              </div>
+              <div class="form-group">
+                <label for="sch-end">Fim do Expediente</label>
+                <input type="time" id="sch-end" value="18:00">
+              </div>
+              <div class="form-group">
+                <label for="sch-break-start">Início do Intervalo / Almoço</label>
+                <input type="time" id="sch-break-start" value="12:00">
+              </div>
+              <div class="form-group">
+                <label for="sch-break-end">Fim do Intervalo / Almoço</label>
+                <input type="time" id="sch-break-end" value="13:00">
+              </div>
+            </div>
+            <button type="submit" class="btn">Salvar Expediente</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Expediente Atual</h2>
+          <div id="admin-schedules-list"></div>
+        </div>
+      </section>
+
+      <!-- Aba 4: Bloqueios Pontuais -->
+      <section id="tab-blocks" class="tab-content hidden" role="tabpanel" aria-labelledby="tab-blocks-control" tabindex="0">
+        <div class="card">
+          <h2>Criar Bloqueio Pontual</h2>
+          <form id="block-form">
+            <div class="form-group">
+              <label for="blk-date">Data do Bloqueio</label>
+              <input type="date" id="blk-date" required>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="blk-fullday"> Bloquear o dia inteiro
+              </label>
+            </div>
+            <div id="blk-times-container">
+              <div class="form-group">
+                <label for="blk-start">Início do Bloqueio</label>
+                <input type="time" id="blk-start">
+              </div>
+              <div class="form-group">
+                <label for="blk-end">Fim do Bloqueio</label>
+                <input type="time" id="blk-end">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="blk-reason">Motivo (ex: Consulta médica, feriado)</label>
+              <input type="text" id="blk-reason" placeholder="Motivo do bloqueio">
+            </div>
+            <button type="submit" class="btn">Adicionar Bloqueio</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Bloqueios Ativos</h2>
+          <div id="admin-blocks-list"></div>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <script src="js/shared-utils.js"></script>
+  <script src="js/contact-config.js"></script>
+  <script src="js/site-content.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

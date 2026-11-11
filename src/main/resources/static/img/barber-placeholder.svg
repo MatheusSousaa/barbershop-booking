@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-labelledby="title description">
+  <title id="title">Ilustração de barbearia</title>
+  <desc id="description">Ilustração abstrata em tons escuros, usada como imagem temporária.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#292522"/>
+      <stop offset="1" stop-color="#0b0b0b"/>
+    </linearGradient>
+    <linearGradient id="chair" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e5484d"/>
+      <stop offset="1" stop-color="#8f1720"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#background)"/>
+  <circle cx="450" cy="470" r="290" fill="none" stroke="#424242" stroke-width="2"/>
+  <path d="M330 300h240l-25 210H355z" fill="#171719" stroke="#77777e" stroke-width="10"/>
+  <path d="M350 530h200l55 230H295z" fill="url(#chair)" stroke="#d0d0d4" stroke-width="8"/>
+  <path d="M400 760v165m100-165v165m-150 0h200" fill="none" stroke="#b7b7bd" stroke-linecap="round" stroke-width="14"/>
+  <path d="M220 1010h460" stroke="#444" stroke-width="3"/>
+  <text x="450" y="1080" fill="#f2f2f2" font-family="system-ui,sans-serif" font-size="30" text-anchor="middle">IMAGEM ILUSTRATIVA</text>
+</svg>
