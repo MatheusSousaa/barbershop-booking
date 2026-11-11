@@ -1,0 +1,45 @@
+# Build outputs and test-generated data
+target/
+build/
+dist/
+node_modules/
+test-uploads/
+surefire-reports/
+failsafe-reports/
+*.log
+logs/
+
+# IDE and editor files
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# Local environment and credentials
+.env
+*.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+
+# Local uploads and personal photos
+/uploads/
+/src/main/resources/static/img/barbeiro.jpg
+/src/main/resources/static/img/**/*.jpg
+/src/main/resources/static/img/**/*.jpeg
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+/src/main/resources/static/img/**/*.png
+/src/main/resources/static/img/**/*.webp
+secrets/
+*.secret
+*.credentials
