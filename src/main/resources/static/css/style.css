@@ -155,7 +155,7 @@ a {
   background:
     linear-gradient(90deg, rgba(7, 7, 8, 0.94) 0%, rgba(7, 7, 8, 0.76) 44%, rgba(7, 7, 8, 0.2) 100%),
     linear-gradient(0deg, var(--color-page), transparent 68%),
-    url("../img/barbeiro.jpg") center 28% / cover,
+    radial-gradient(ellipse at 78% 42%, rgba(229, 72, 77, 0.14), transparent 34rem),
     #161618;
   border-bottom: 1px solid var(--color-border);
 }
@@ -1542,7 +1542,7 @@ textarea:focus {
 .hero-editorial::before {
   position: absolute;
   inset: 0;
-  background: url("../img/barbeiro.jpg") right 8% center / auto 82% no-repeat;
+  background: radial-gradient(ellipse at 72% 46%, rgba(229, 72, 77, 0.12), transparent 36rem);
   content: "";
   pointer-events: none;
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 46%, #000 82%, transparent 100%);
@@ -2113,7 +2113,7 @@ textarea:focus {
   background:
     linear-gradient(90deg, rgba(7, 7, 8, 0.97) 0%, rgba(7, 7, 8, 0.84) 38%, rgba(7, 7, 8, 0.12) 78%),
     linear-gradient(0deg, var(--color-page), transparent 40%),
-    url("../img/barbeiro.jpg") 74% 34% / auto 92% no-repeat,
+    radial-gradient(ellipse at 76% 38%, rgba(229, 72, 77, 0.12), transparent 34rem),
     #0b0b0c;
 }
 
@@ -2323,7 +2323,7 @@ textarea:focus {
     background:
       linear-gradient(90deg, rgba(7, 7, 8, 0.94), rgba(7, 7, 8, 0.58) 68%, rgba(7, 7, 8, 0.28)),
       linear-gradient(0deg, var(--color-page), transparent 42%),
-      url("../img/barbeiro.jpg") 62% 20% / auto 82% no-repeat,
+      radial-gradient(ellipse at 65% 25%, rgba(229, 72, 77, 0.1), transparent 27rem),
       #0b0b0c;
   }
 
