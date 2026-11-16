@@ -385,7 +385,7 @@ function showCatalogFallback(container, message, allowRetry = false) {
   const phone = BarbershopUtils.normalizeBrazilianPhone(window.BARBERSHOP_CONTACT?.barberWhatsApp);
   if (phone) {
     const link = document.createElement('a');
-    const text = encodeURIComponent('Olá! Gostaria de consultar os serviços e agendar um horário na Barber Braga.');
+    const text = encodeURIComponent('Olá! Gostaria de consultar os serviços e agendar um horário na barbearia.');
     link.href = `https://wa.me/${phone}?text=${text}`;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
@@ -719,13 +719,13 @@ function saveAppointmentToCalendar() {
   const calendar = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Barber Braga//Agendamento//PT-BR',
+    'PRODID:-//Barbearia//Agendamento//PT-BR',
     'BEGIN:VEVENT',
     `UID:${appointment.id || `${appointment.appointmentDate}-${appointment.startTime}`}@barberclassic`,
     `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')}`,
     `DTSTART:${toCalendarDate(start)}`,
     `DTEND:${toCalendarDate(end)}`,
-    `SUMMARY:${escapeCalendarText(`${window.BARBERSHOP_CONTENT?.brandName || 'Barber Braga'} - ${appointment.serviceName}`)}`,
+    `SUMMARY:${escapeCalendarText(`${window.BARBERSHOP_CONTENT?.brandName || 'Barbearia'} - ${appointment.serviceName}`)}`,
     `DESCRIPTION:${escapeCalendarText(`Agendamento: ${appointment.serviceName}`)}`,
     'END:VEVENT',
     'END:VCALENDAR'
