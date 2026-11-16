@@ -165,9 +165,7 @@ function initializeBookingEvents() {
   document.getElementById('appointment-form').addEventListener('submit', submitAppointment);
   document.getElementById('btn-new-appointment').addEventListener('click', resetBookingFlow);
   const whatsappButton = document.getElementById('btn-whatsapp-confirmation');
-  const barberWhatsApp = BarbershopUtils.normalizeBrazilianPhone(window.BARBERSHOP_CONTACT?.barberWhatsApp);
-  if (barberWhatsApp) whatsappButton.addEventListener('click', openBarberWhatsApp);
-  else whatsappButton.remove();
+  whatsappButton.addEventListener('click', openBarberWhatsApp);
   document.getElementById('btn-save-calendar').addEventListener('click', saveAppointmentToCalendar);
   initializePhotoViewer();
   document.getElementById('name-error').controlInput = document.getElementById('client-name');
@@ -691,7 +689,7 @@ function showSuccess(data) {
 function openBarberWhatsApp() {
   const phone = BarbershopUtils.normalizeBrazilianPhone(window.BARBERSHOP_CONTACT?.barberWhatsApp);
   if (!phone) {
-    showGlobalMessage('Configure o WhatsApp do barbeiro em js/contact-config.js para enviar a confirmação.', 'error');
+    showGlobalMessage('O WhatsApp da barbearia ainda não está configurado.', 'error');
     return;
   }
   const appointment = bookingState.confirmedAppointment;
