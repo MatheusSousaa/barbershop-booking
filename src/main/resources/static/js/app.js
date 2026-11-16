@@ -164,7 +164,10 @@ function initializePhoneInput() {
 function initializeBookingEvents() {
   document.getElementById('appointment-form').addEventListener('submit', submitAppointment);
   document.getElementById('btn-new-appointment').addEventListener('click', resetBookingFlow);
-  document.getElementById('btn-whatsapp-confirmation').addEventListener('click', openBarberWhatsApp);
+  const whatsappButton = document.getElementById('btn-whatsapp-confirmation');
+  const barberWhatsApp = BarbershopUtils.normalizeBrazilianPhone(window.BARBERSHOP_CONTACT?.barberWhatsApp);
+  if (barberWhatsApp) whatsappButton.addEventListener('click', openBarberWhatsApp);
+  else whatsappButton.remove();
   document.getElementById('btn-save-calendar').addEventListener('click', saveAppointmentToCalendar);
   initializePhotoViewer();
   document.getElementById('name-error').controlInput = document.getElementById('client-name');

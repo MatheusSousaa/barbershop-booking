@@ -1,4 +1,4 @@
-// Configure o WhatsApp do barbeiro aqui, usando DDI + DDD + número, apenas dígitos.
+// O WhatsApp do barbeiro permanece desativado até um número ser configurado.
 window.BARBERSHOP_CONTACT = Object.freeze({
-  barberWhatsApp: '5577998186050'
+  barberWhatsApp: ''
 });
