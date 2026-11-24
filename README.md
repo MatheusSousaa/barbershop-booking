@@ -1,10 +1,3 @@
-# Sistema de Agendamento para Barbearia
-
-Projeto desenvolvido para uma barbearia do meu bairro. Clientes consultam serviços e horários disponíveis e fazem agendamentos online. O barbeiro gerencia a agenda pelo painel administrativo.
-
-<img width="1467" height="736" alt="image" src="https://github.com/user-attachments/assets/2193f150-5494-4e2e-a52c-be612a041323" />
-<img width="556" height="908" alt="image" src="https://github.com/user-attachments/assets/6d9b6693-27a3-416c-ae06-5eabb593a472" />
-
 # Barbershop Booking
 
 Sistema web de agendamento desenvolvido como primeiro projeto freelance para uma barbearia local. A aplicação substitui parte do atendimento manual por um fluxo online: o cliente consulta os serviços, escolhe uma data e um horário realmente disponível e envia a reserva. Pelo painel, o barbeiro organiza os serviços, o expediente e a agenda.
@@ -198,4 +191,3 @@ Este foi meu primeiro trabalho freelance: construí uma solução para facilitar
 ## Licença
 
 Distribuído sob a licença MIT. Consulte [`LICENSE`](LICENSE).
-
